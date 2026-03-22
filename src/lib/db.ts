@@ -1,55 +1,25 @@
-import Database from "better-sqlite3";
-import path from "path";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const DB_PATH = path.join(process.env.DB_DIR || process.cwd(), "hsc-ready.db");
+let _supabase: SupabaseClient | null = null;
 
-let db: Database.Database | null = null;
-
-export function getDb(): Database.Database {
-  if (!db) {
-    db = new Database(DB_PATH);
-    db.pragma("journal_mode = WAL");
-    db.pragma("foreign_keys = ON");
-    initTables(db);
+export function getSupabase(): SupabaseClient {
+  if (!_supabase) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) {
+      throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env vars");
+    }
+    _supabase = createClient(url, key);
   }
-  return db;
+  return _supabase;
 }
 
-function initTables(db: Database.Database): void {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT NOT NULL UNIQUE,
-      name TEXT NOT NULL,
-      password_hash TEXT NOT NULL,
-      created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-
-    CREATE TABLE IF NOT EXISTS quiz_results (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      quiz_config TEXT NOT NULL,
-      started_at TEXT,
-      completed_at TEXT NOT NULL DEFAULT (datetime('now')),
-      total_marks INTEGER NOT NULL,
-      marks_achieved INTEGER NOT NULL,
-      feedback_summary TEXT,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    );
-
-    CREATE TABLE IF NOT EXISTS question_results (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      quiz_result_id INTEGER NOT NULL,
-      question_id TEXT NOT NULL,
-      student_answer TEXT,
-      marks_awarded INTEGER NOT NULL,
-      marks_possible INTEGER NOT NULL,
-      feedback TEXT,
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      FOREIGN KEY (quiz_result_id) REFERENCES quiz_results(id) ON DELETE CASCADE
-    );
-  `);
-}
+// Convenience alias
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    return (getSupabase() as unknown as Record<string | symbol, unknown>)[prop];
+  },
+});
 
 export interface User {
   id: number;

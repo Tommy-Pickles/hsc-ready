@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { supabase } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 
 interface QuestionPayload {
@@ -52,48 +52,49 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const db = getDb();
+    // Insert quiz result
+    const { data: quizResult, error: quizError } = await supabase
+      .from("quiz_results")
+      .insert({
+        user_id: user.userId,
+        quiz_config: JSON.stringify(quizConfig),
+        started_at: startedAt ?? null,
+        total_marks: totalMarks,
+        marks_achieved: marksAchieved,
+        feedback_summary: feedbackSummary ? JSON.stringify(feedbackSummary) : null,
+      })
+      .select("id")
+      .single();
 
-    const insertQuizResult = db.prepare(`
-      INSERT INTO quiz_results (user_id, quiz_config, started_at, total_marks, marks_achieved, feedback_summary)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `);
-
-    const insertQuestionResult = db.prepare(`
-      INSERT INTO question_results (quiz_result_id, question_id, student_answer, marks_awarded, marks_possible, feedback)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `);
-
-    const saveAll = db.transaction(() => {
-      const result = insertQuizResult.run(
-        user.userId,
-        JSON.stringify(quizConfig),
-        startedAt ?? null,
-        totalMarks,
-        marksAchieved,
-        feedbackSummary ? JSON.stringify(feedbackSummary) : null
+    if (quizError || !quizResult) {
+      console.error("Quiz insert error:", quizError);
+      return NextResponse.json(
+        { error: "Failed to save quiz result" },
+        { status: 500 }
       );
+    }
 
-      const quizResultId = result.lastInsertRowid as number;
+    // Insert question results
+    const questionRows = questions.map((q) => ({
+      quiz_result_id: quizResult.id,
+      question_id: q.questionId,
+      student_answer: q.studentAnswer ?? null,
+      marks_awarded: q.marksAwarded,
+      marks_possible: q.marksPossible,
+      feedback: q.feedback ? JSON.stringify(q.feedback) : null,
+    }));
 
-      for (const q of questions) {
-        insertQuestionResult.run(
-          quizResultId,
-          q.questionId,
-          q.studentAnswer ?? null,
-          q.marksAwarded,
-          q.marksPossible,
-          q.feedback ? JSON.stringify(q.feedback) : null
-        );
-      }
+    const { error: questionsError } = await supabase
+      .from("question_results")
+      .insert(questionRows);
 
-      return quizResultId;
-    });
-
-    const quizResultId = saveAll();
+    if (questionsError) {
+      console.error("Questions insert error:", questionsError);
+      // Still return success since quiz was saved
+    }
 
     return NextResponse.json(
-      { quizResultId, message: "Quiz result saved successfully" },
+      { quizResultId: quizResult.id, message: "Quiz result saved successfully" },
       { status: 201 }
     );
   } catch (error) {

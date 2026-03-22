@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb, QuizResult } from "@/lib/db";
+import { supabase } from "@/lib/db";
 import { getUser } from "@/lib/auth";
-
-interface QuizResultRow extends QuizResult {
-  question_count: number;
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,43 +13,38 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const db = getDb();
+    // Get quiz results with question counts
+    const { data: results, error } = await supabase
+      .from("quiz_results")
+      .select("*, question_results(id)")
+      .eq("user_id", user.userId)
+      .order("completed_at", { ascending: false });
 
-    const results = db
-      .prepare(
-        `
-        SELECT
-          qr.id,
-          qr.user_id,
-          qr.quiz_config,
-          qr.started_at,
-          qr.completed_at,
-          qr.total_marks,
-          qr.marks_achieved,
-          qr.feedback_summary,
-          COUNT(qres.id) AS question_count
-        FROM quiz_results qr
-        LEFT JOIN question_results qres ON qres.quiz_result_id = qr.id
-        WHERE qr.user_id = ?
-        GROUP BY qr.id
-        ORDER BY qr.completed_at DESC
-      `
-      )
-      .all(user.userId) as QuizResultRow[];
+    if (error) {
+      console.error("History query error:", error);
+      return NextResponse.json(
+        { error: "Failed to fetch history" },
+        { status: 500 }
+      );
+    }
 
-    const parsed = results.map((r) => ({
+    const parsed = (results || []).map((r) => ({
       id: r.id,
       completedAt: r.completed_at,
       startedAt: r.started_at,
-      quizConfig: JSON.parse(r.quiz_config),
+      quizConfig: typeof r.quiz_config === "string" ? JSON.parse(r.quiz_config) : r.quiz_config,
       totalMarks: r.total_marks,
       marksAchieved: r.marks_achieved,
       percentage:
         r.total_marks > 0
           ? Math.round((r.marks_achieved / r.total_marks) * 100)
           : 0,
-      feedbackSummary: r.feedback_summary ? JSON.parse(r.feedback_summary) : null,
-      questionCount: r.question_count,
+      feedbackSummary: r.feedback_summary
+        ? typeof r.feedback_summary === "string"
+          ? JSON.parse(r.feedback_summary)
+          : r.feedback_summary
+        : null,
+      questionCount: Array.isArray(r.question_results) ? r.question_results.length : 0,
     }));
 
     // Compute summary statistics
@@ -86,7 +77,6 @@ export async function GET(request: NextRequest) {
           const num = mod.replace(/\D/g, "");
           moduleMap[key] = { earned: 0, possible: 0, label: MODULE_LABELS[num] || key };
         }
-        // Distribute marks evenly across modules for this quiz
         const share = 1 / modules.length;
         moduleMap[key].earned += r.marksAchieved * share;
         moduleMap[key].possible += r.totalMarks * share;
@@ -104,7 +94,6 @@ export async function GET(request: NextRequest) {
       ? moduleScores.reduce((best, m) => (m.score > best.score ? m : best)).label
       : null;
 
-    // Recent attempts in dashboard format
     const recentAttempts = parsed.slice(0, 10).map((r) => ({
       id: String(r.id),
       date: r.completedAt,
@@ -117,7 +106,6 @@ export async function GET(request: NextRequest) {
     }));
 
     return NextResponse.json({
-      // History page format
       results: parsed,
       stats: {
         totalQuizzes,
@@ -126,7 +114,6 @@ export async function GET(request: NextRequest) {
         totalMarksEarned,
         totalMarksPossible,
       },
-      // Dashboard format
       totalQuizzes,
       averageScore: averagePercentage,
       questionsPracticed,

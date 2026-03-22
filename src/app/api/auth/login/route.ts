@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb, User } from "@/lib/db";
+import { supabase, User } from "@/lib/db";
 import { signToken, verifyPassword, AUTH_COOKIE_NAME } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
@@ -21,13 +21,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const db = getDb();
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email.toLowerCase().trim())
+      .single();
 
-    const user = db
-      .prepare("SELECT * FROM users WHERE email = ?")
-      .get(email.toLowerCase().trim()) as User | undefined;
-
-    if (!user) {
+    if (error || !user) {
       return NextResponse.json(
         { error: "Invalid email or password" },
         { status: 401 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { supabase } from "@/lib/db";
 import { signToken, hashPassword, AUTH_COOKIE_NAME } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
@@ -28,11 +28,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const db = getDb();
-
-    const existingUser = db
-      .prepare("SELECT id FROM users WHERE email = ?")
-      .get(email.toLowerCase().trim());
+    const { data: existingUser } = await supabase
+      .from("users")
+      .select("id")
+      .eq("email", email.toLowerCase().trim())
+      .single();
 
     if (existingUser) {
       return NextResponse.json(
@@ -43,26 +43,36 @@ export async function POST(request: NextRequest) {
 
     const passwordHash = await hashPassword(password);
 
-    const result = db
-      .prepare(
-        "INSERT INTO users (email, name, password_hash) VALUES (?, ?, ?)"
-      )
-      .run(email.toLowerCase().trim(), name.trim(), passwordHash);
+    const { data: newUser, error } = await supabase
+      .from("users")
+      .insert({
+        email: email.toLowerCase().trim(),
+        name: name.trim(),
+        password_hash: passwordHash,
+      })
+      .select("id, email, name")
+      .single();
 
-    const userId = result.lastInsertRowid as number;
+    if (error || !newUser) {
+      console.error("Insert error:", error);
+      return NextResponse.json(
+        { error: "Failed to create account" },
+        { status: 500 }
+      );
+    }
 
     const token = await signToken({
-      userId,
-      email: email.toLowerCase().trim(),
-      name: name.trim(),
+      userId: newUser.id,
+      email: newUser.email,
+      name: newUser.name,
     });
 
     const response = NextResponse.json(
       {
         user: {
-          id: userId,
-          email: email.toLowerCase().trim(),
-          name: name.trim(),
+          id: newUser.id,
+          email: newUser.email,
+          name: newUser.name,
         },
       },
       { status: 201 }
