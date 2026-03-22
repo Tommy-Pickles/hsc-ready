@@ -8,6 +8,7 @@ interface Question {
   id: string;
   examPage?: number;
   examFile?: string;
+  examImages?: string[];
   year: number;
   questionNumber: string;
   type: "mc" | "short_answer" | "extended_response";
@@ -624,7 +625,13 @@ export default function ResultsPage() {
                         {/* Question */}
                         <div>
                           <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Question</h4>
-                          {q.examPage ? (
+                          {q.examImages ? (
+                            <div className="rounded-xl border border-slate-200 overflow-hidden bg-white">
+                              {q.examImages.map((img: string, i: number) => (
+                                <img key={i} src={`/exams/${q.year}/questions/${img}`} alt={`${q.year} HSC Biology Q${q.questionNumber} (${i+1})`} className="w-full block" loading="lazy" />
+                              ))}
+                            </div>
+                          ) : q.examPage ? (
                             <div className="rounded-xl border border-slate-200 overflow-hidden bg-white">
                               <img
                                 src={`/exams/${q.year}/questions/${q.type === "mc" ? `${q.year}-mc${q.questionNumber}` : `${q.year}-q${q.questionNumber.match(/^\d+/)?.[0]}`}.jpg`}
@@ -634,7 +641,7 @@ export default function ResultsPage() {
                               />
                             </div>
                           ) : (
-                            <p className="text-sm text-slate-600 whitespace-pre-wrap">{q.questionText}</p>
+                            <p className="text-sm text-slate-600 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: q.questionText.replace(/\^([A-Za-z0-9]+)/g, '<sup>$1</sup>') }} />
                           )}
                         </div>
 

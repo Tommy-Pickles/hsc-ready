@@ -10,6 +10,7 @@ interface Question {
   id: string;
   examPage?: number;
   examFile?: string;
+  examImages?: string[];
   year: number;
   questionNumber: string;
   type: "mc" | "short_answer" | "extended_response";
@@ -211,7 +212,24 @@ function QuizTakeInner() {
             </div>
 
             {/* Individual question image cropped from exam PDF */}
-            {currentQuestion.examPage ? (
+            {currentQuestion.examImages ? (
+              <div>
+                <div className="rounded-xl border border-slate-200 overflow-hidden bg-white">
+                  {currentQuestion.examImages.map((img, i) => (
+                    <img
+                      key={i}
+                      src={`/exams/${currentQuestion.year}/questions/${img}`}
+                      alt={`${currentQuestion.year} HSC Biology Q${currentQuestion.questionNumber} (${i + 1})`}
+                      className="w-full block"
+                      loading="lazy"
+                    />
+                  ))}
+                </div>
+                <p className="text-xs text-slate-400 text-center mt-1">
+                  {currentQuestion.year} HSC Biology — Q{currentQuestion.questionNumber}
+                </p>
+              </div>
+            ) : currentQuestion.examPage ? (
               <div>
                 <div className="rounded-xl border border-slate-200 overflow-hidden bg-white">
                   <img
@@ -226,9 +244,9 @@ function QuizTakeInner() {
                 </p>
               </div>
             ) : (
-              <div className="text-slate-800 leading-relaxed whitespace-pre-wrap">
-                {currentQuestion.questionText}
-              </div>
+              <div className="text-slate-800 leading-relaxed whitespace-pre-wrap"
+                dangerouslySetInnerHTML={{ __html: currentQuestion.questionText.replace(/\^([A-Za-z0-9]+)/g, '<sup>$1</sup>') }}
+              />
             )}
           </div>
 
@@ -237,21 +255,33 @@ function QuizTakeInner() {
             <h3 className="text-sm font-semibold text-slate-600 mb-4">Your Answer</h3>
 
             {currentQuestion.type === "mc" ? (
-              /* Multiple Choice - simple A/B/C/D buttons */
-              <div className="flex gap-3">
+              /* Multiple Choice - show option text with selectable buttons */
+              <div className="flex flex-col gap-2">
                 {["A", "B", "C", "D"].map((key) => {
                   const selected = answers[currentQuestion.id]?.answer === key;
+                  const optionText = currentQuestion.options?.[key];
                   return (
                     <button
                       key={key}
                       onClick={() => setAnswer(currentQuestion.id, key)}
-                      className={`w-14 h-14 rounded-xl border-2 flex items-center justify-center font-bold text-lg transition-all ${
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all ${
                         selected
-                          ? "border-blue-500 bg-blue-500 text-white shadow-lg shadow-blue-500/30"
-                          : "border-slate-200 hover:border-blue-400 bg-slate-50 text-slate-600"
+                          ? "border-blue-500 bg-blue-50 shadow-lg shadow-blue-500/10"
+                          : "border-slate-200 hover:border-blue-400 bg-slate-50"
                       }`}
                     >
-                      {key}
+                      <span className={`w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center font-bold text-lg ${
+                        selected
+                          ? "bg-blue-500 text-white"
+                          : "bg-white text-slate-600 border border-slate-200"
+                      }`}>
+                        {key}
+                      </span>
+                      {optionText && (
+                        <span className={`text-sm ${selected ? "text-blue-700 font-medium" : "text-slate-600"}`}
+                          dangerouslySetInnerHTML={{ __html: optionText.replace(/\^([A-Za-z0-9]+)/g, '<sup>$1</sup>') }}
+                        />
+                      )}
                     </button>
                   );
                 })}
