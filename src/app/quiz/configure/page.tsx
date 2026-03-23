@@ -31,10 +31,10 @@ const QUESTION_TYPES = [
 ]
 
 const QUIZ_LENGTHS = [
-  { id: 'quick', label: 'Quick', questions: 10, time: '~15 min', icon: '⚡', value: 10 },
-  { id: 'short', label: 'Short', questions: 20, time: '~30 min', icon: '🏃', value: 20 },
-  { id: 'medium', label: 'Medium', questions: 30, time: '~45 min', icon: '🎯', value: 30 },
-  { id: 'long', label: 'Full HSC', questions: null, time: '~3 hours', icon: '🏆', value: 0 },
+  { id: 'quick', label: 'Quick', marks: 10, time: '~15 min', icon: '⚡', value: 10 },
+  { id: 'short', label: 'Short', marks: 20, time: '~30 min', icon: '🏃', value: 20 },
+  { id: 'medium', label: 'Medium', marks: 40, time: '~60 min', icon: '🎯', value: 40 },
+  { id: 'long', label: 'Full HSC', marks: 0, time: '~3 hours', icon: '🏆', value: 0 },
 ]
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -85,7 +85,7 @@ function ConfigurePageInner() {
     if (config.modules.length) params.set('modules', config.modules.join(','))
     params.set('type', config.questionType)
     params.set('length', config.quizLength)
-    if (config.lengthValue) params.set('count', String(config.lengthValue))
+    if (config.lengthValue) params.set('marks', String(config.lengthValue))
     return params.toString()
   }
 
@@ -223,7 +223,7 @@ function ConfigurePageInner() {
         {/* ── Section 3: Quiz Length ───────────────────────────────────────── */}
         <section className="bg-white border border-slate-200 rounded-2xl p-6">
           <h2 className="text-lg font-semibold text-slate-900 mb-1">Quiz Length</h2>
-          <p className="text-slate-500 text-sm mb-5">How many questions do you want to attempt?</p>
+          <p className="text-slate-500 text-sm mb-5">Choose total marks — allow ~1.5 min per mark</p>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {QUIZ_LENGTHS.map((length) => {
@@ -244,7 +244,7 @@ function ConfigurePageInner() {
                       {length.label}
                     </div>
                     <div className="text-slate-500 text-xs mt-0.5">
-                      {length.questions ? `${length.questions} questions` : 'Full paper'}
+                      {length.marks ? `${length.marks} marks` : 'Full paper'}
                     </div>
                     <div className="text-slate-400 text-xs">{length.time}</div>
                   </div>

@@ -351,7 +351,7 @@ function SelectPageInner() {
                   {selected.size} question{selected.size !== 1 ? 's' : ''} selected
                 </div>
                 <div className="bg-purple-500/10 border border-purple-500/20 text-purple-600 rounded-xl px-4 py-2 text-sm font-medium">
-                  {totalMarks} mark{totalMarks !== 1 ? 's' : ''} total
+                  {totalMarks} marks · ~{Math.round(totalMarks * 1.5)} min
                 </div>
               </>
             ) : (

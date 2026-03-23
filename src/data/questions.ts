@@ -232,7 +232,7 @@ export function getQuestionsByFilter(filters: {
 export function selectAutoQuiz(filters: {
   modules?: string[];
   type?: string;
-  count: number;
+  targetMarks: number;
 }): Question[] {
   let pool = getQuestionsByFilter(filters);
 
@@ -248,8 +248,22 @@ export function selectAutoQuiz(filters: {
     return selected;
   }
 
-  // Shuffle and take count
-  return shuffle(pool).slice(0, filters.count || 20);
+  // Select questions until we reach the target marks (0 = all questions)
+  if (!filters.targetMarks) {
+    return shuffle(pool);
+  }
+
+  const shuffled = shuffle(pool);
+  const selected: Question[] = [];
+  let totalMarks = 0;
+
+  for (const q of shuffled) {
+    if (totalMarks >= filters.targetMarks) break;
+    selected.push(q);
+    totalMarks += q.marks;
+  }
+
+  return selected;
 }
 
 function shuffle<T>(arr: T[]): T[] {

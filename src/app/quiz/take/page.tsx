@@ -64,7 +64,16 @@ function QuizTakeInner() {
   const [showDrawing, setShowDrawing] = useState(false);
   const [showDrawingPart, setShowDrawingPart] = useState<string | null>(null);
   const [startTime] = useState(Date.now());
+  const [elapsed, setElapsed] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Live timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [startTime]);
 
   useEffect(() => {
     async function loadQuestions() {
@@ -73,9 +82,9 @@ function QuizTakeInner() {
       if (isAuto) {
         const modules = searchParams.get("modules") || "";
         const type = searchParams.get("type") || "all";
-        const count = searchParams.get("count") || "20";
+        const marks = searchParams.get("marks") || searchParams.get("count") || "20";
         const res = await fetch(
-          `/api/quiz/auto?modules=${modules}&type=${type}&count=${count}`
+          `/api/quiz/auto?modules=${modules}&type=${type}&marks=${marks}`
         );
         const data = await res.json();
         setQuestions(data);
@@ -162,9 +171,14 @@ function QuizTakeInner() {
             <span className="text-slate-500">
               Question {currentIndex + 1} of {questions.length}
             </span>
-            <span className="text-slate-500">
-              {answeredCount}/{questions.length} answered · {totalMarks} total marks
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-slate-400 font-mono text-xs bg-slate-100 px-2 py-0.5 rounded">
+                {Math.floor(elapsed / 3600) > 0 ? `${Math.floor(elapsed / 3600)}:` : ""}{String(Math.floor((elapsed % 3600) / 60)).padStart(2, "0")}:{String(elapsed % 60).padStart(2, "0")}
+              </span>
+              <span className="text-slate-500">
+                {answeredCount}/{questions.length} answered · {totalMarks} marks
+              </span>
+            </div>
           </div>
           <div className="progress-bar">
             <div
