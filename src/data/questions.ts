@@ -87,7 +87,7 @@ const EXAM_PAGES: Record<string, number> = {
   "2021-q26":22,"2021-q27":23,
   "2021-q28":24,
   "2021-q29":26,"2021-q30":28,"2021-q31":30,"2021-q32":31,
-  "2021-q33":32,
+  // "2021-q33" removed — copyright-blocked graph
   // 2022
   "2022-mc1":2,"2022-mc2":2,"2022-mc3":2,"2022-mc4":3,"2022-mc5":3,"2022-mc6":4,
   "2022-mc7":4,"2022-mc8":4,"2022-mc9":5,"2022-mc10":6,"2022-mc11":6,"2022-mc12":7,
@@ -137,7 +137,7 @@ const EXAM_PAGES: Record<string, number> = {
   "2024-q31":32,
   "2024-q32":33,
   "2024-q33":34,
-  "2024-q34":36,"2024-q35":37,
+  "2024-q34":36,
 };
 
 // Questions that span multiple pages — maps question ID prefix to last page
@@ -149,7 +149,7 @@ const EXAM_PAGE_END: Record<string, number> = {
   "2020-q31":30, "2020-q32":35,
   // 2021
   "2021-q21":16, "2021-q24":19, "2021-q25":21,
-  "2021-q28":25, "2021-q29":27, "2021-q30":29, "2021-q33":35,
+  "2021-q28":25, "2021-q29":27, "2021-q30":29,
   // 2022
   "2022-q24":19, "2022-q27":23, "2022-q28":25, "2022-q29":27,
   "2022-q30":29, "2022-q31":33, "2022-q32":35,
@@ -167,16 +167,16 @@ const STIMULUS_PAGES: Record<string, number> = {
 };
 
 function detectParts(criteria: string): { label: string; marks: number }[] | undefined {
-  // Match "Part A:", "Part B:", etc. in marking criteria
-  const partMatches = criteria.match(/Part\s+([A-Z](?:I{0,3}))\s*:/gi);
+  // Match "Part A:", "Part A (3 marks):", etc. in marking criteria
+  const partMatches = criteria.match(/Part\s+([A-Z](?:I{0,3}))\s*(?::|\()/gi);
   if (!partMatches || partMatches.length < 2) return undefined;
 
   const parts: { label: string; marks: number }[] = [];
   for (const pm of partMatches) {
-    const label = pm.replace(/Part\s+/i, "").replace(":", "").trim().toLowerCase();
-    // Try to find marks for this part: "Part A: X marks" or "Part A: X mark"
+    const label = pm.replace(/Part\s+/i, "").replace(/[:()]/g, "").trim().toLowerCase();
+    // Try to find marks for this part: "Part A: 3 marks:" or "Part A (3 marks):"
     const marksMatch = criteria.match(
-      new RegExp(`Part\\s+${label}\\s*:\\s*(\\d+)\\s+marks?`, "i")
+      new RegExp("Part\\s+" + label + "\\s*(?::|\\()\\s*(\\d+)\\s+marks?", "i")
     );
     parts.push({
       label: `(${label})`,
@@ -342,6 +342,7 @@ const questions2019: Question[] = [
     markingCriteria: "Part A: 1 mark: Correctly identifies chromosomal mutation\nPart B: 4 marks: Explains how meiosis can lead to the karyotype; Explains how fertilisation can lead to the karyotype\n3 marks: Relates a problem during separation of chromosomes during meiosis to a lack of one chromosome in the offspring; Relates how fertilization can lead to a lack of one chromosome in the offspring\n2 marks: Links a problem during cell division to the absence of a chromosome\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: There is only one copy of the sex chromosome (monosomy / Turner syndrome).\nPart B: If homologous chromosomes in Meiosis I (or sister chromatids in Meiosis II) do not separate correctly, one gamete will end up with 2 copies of the same chromosome and another gamete will end up without a copy of this chromosome. After fertilisation, the gamete with no copy of sex chromosome has joined with a normal gamete to produce an individual with only one sex chromosome.",
     hasImage: true,
+    examImages: ["2019-q25a.jpg"],
     imageDescription: "Karyotype showing chromosomal abnormality with single sex chromosome",
   },
 {
@@ -367,6 +368,7 @@ const questions2019: Question[] = [
     markingCriteria: "Part A: 1 mark: Identifies the type of reproduction\nPart B: 4 marks: Provides a suitable procedure which includes: How the independent variable is changed, How the dependent variable is measured, Variables kept constant, Repetition, Logical sequence\n3 marks: Outlines how the independent variable is changed; Outlines how the dependent variable is measured AND Includes variables kept constant OR includes repetition\n2 marks: Provides features of a relevant investigation\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: Asexual reproduction\nPart B: 1. Prepare a suspension of yeast cells. 2. Prepare water baths at three temperatures (15°C, 25°C and 35°C). 3. Mix the suspension. 4. Measure and place 5 mL of suspension into 9 test tubes. 5. Place three test tubes in each water bath. 6. Incubate for 2 hours and mix. 7. Take a drop from each test tube and place on a microscope slide with a coverslip. 8. Count the yeast cells using a mm grid on low power at each temperature and record the data. 9. Compare the number of cells recorded at each temperature.",
     hasImage: true,
+    examImages: ["2019-q27a.jpg"],
     imageDescription: "Diagram showing yeast cell budding",
   },
   {
@@ -383,6 +385,7 @@ const questions2019: Question[] = [
     markingCriteria: "Part A: 2 marks: Suitable alleles identified for both parents\n1 mark: Provides some relevant information\nPart B: 4 marks: Completes the diagram showing: Genotype clearly modelled throughout, Alleles correctly modelled, Crossing over correctly modelled, Suitable key provided\n3 marks: Provides a substantially correct model\n2 marks: Provides some correct features\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: Alleles from father: H, r. Alleles from mother: h, R.\nPart B: A diagram showing crossing over between two linked genes during meiosis, with a key showing the alleles and resulting recombinant gametes.",
     hasImage: true,
+    examImages: ["2019-q28a.jpg"],
     imageDescription: "Genetics problem with two linked traits",
   },
 {
@@ -417,6 +420,7 @@ const questions2019: Question[] = [
     markingCriteria: "Part A: 2 marks: Outlines one adaptation that facilitates entry of a specific pathogen into its host\n1 mark: Provides some relevant information\nPart B: 3 marks: Explains how the mode of transmission of pathogens affects the spread of diseases\n2 marks: Outlines how one mode of transmission of a pathogen affects the spread a disease OR Identifies modes of transmission of pathogens\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: The bacterium Helicobacter pylori causes stomach ulcers in humans. It has a flagellum that allows it to move and penetrate the mucus lining/barrier of the stomach wall.\nPart B: Some diseases are spread easily by the pathogen passing between people in droplets in the air, eg influenza virus, and therefore the rates of infection are high in populated areas. If an intermediate host or a vector is required then the spread of the disease may be slower depending on the presence of the vector.",
     hasImage: false,
+    examImages: ["2019-q31a.jpg"],
   },
   {
     id: "2019-q32",
@@ -432,6 +436,7 @@ const questions2019: Question[] = [
     markingCriteria: "Part A: 3 marks: Identifies relevant global trends in malaria and dengue fever, based on the data provided\n2 marks: Identifies trends in the incidence of malaria and dengue fever\n1 mark: Provides a relevant trend\nPart B: 7 marks: Provides a thorough analysis of factors that could have affected the global distribution over time of both malaria and dengue fever; Relates analysis to data provided\n6 marks: Provides a sound analysis of factors that could have affected the global distribution over time of both malaria and dengue fever; Refers to data provided\n4-5 marks: Explains factors that could have affected global distribution over time of malaria and/or dengue fever; Refers to data provided\n2-3 marks: Outlines factors that could have affected the distribution of malaria and/or dengue fever\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: The distribution of dengue fever appears to have increased markedly since 1950. There are many more parts of the world such as South America and Africa that are now affected. The number of countries with reported cases of malaria has decreased significantly. However, there is a growing number of people at risk, but representing a smaller percentage of the global population.\nPart B: The global distribution of both dengue fever and malaria is likely to be associated with mosquito vectors. Airline travel has increased markedly offering opportunities for both infected people and the mosquito vectors to be transported around the world. In addition, world population has increased which will increase the density of potential hosts. With increasing urbanisation, new urban habitats for mosquitoes could have emerged. Medical advances have the capacity to prevent or control these diseases, for example development of vaccines. Pesticide spraying on water bodies to kill mosquitoes has helped contain malaria distribution.",
     hasImage: true,
+    examImages: ["2019-q32a.jpg", "2019-q32.jpg"],
     imageDescription: "Maps and data showing global distribution of malaria and dengue fever over time",
   },
   {
@@ -448,6 +453,7 @@ const questions2019: Question[] = [
     markingCriteria: "Part A: 3 marks: Outlines processes of transcription AND translation\n2 marks: Provides features of transcription AND/OR translation\n1 mark: Provides some relevant information\nPart BI: 2 marks: Provides a suitable definition\n1 mark: Provides some relevant information\nPart BII: 4 marks: Analyses the data to provide relevant conclusions about the risk associated with the alleles and combinations of alleles\n3 marks: Analyses the data to provide suitable conclusions about the risk associated with the alleles\n2 marks: Outlines risks associated with alleles\n1 mark: Provides some relevant information\nPart C: 3 marks: Describes trends in the data\n2 marks: Outlines trends in the data\n1 mark: Provides some relevant information\nPart D: 8 marks: Demonstrates an extensive knowledge of infectious and non-infectious disease, including criteria for classification of disease; Supports the classification of AD with detailed and appropriate reference to information and data provided; Justifies a suitable judgement; Communicates logically and succinctly with precise biological terms\n7 marks: Demonstrates a thorough knowledge; Supports classification with appropriate reference; Justifies a suitable judgement; Communicates logically using biological terms\n5-6 marks: Demonstrates a sound knowledge; Supports classification with some reference; Provides a suitable judgement; Communicates effectively using biological terms\n3-4 marks: Demonstrates some knowledge of the infectious and/or non-infectious disease; Relates data to classification of AD\n2 marks: Provides information about infectious or non-infectious disease and AD data OR Relates data to classification of AD OR Provides information about infectious and non-infectious disease\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: The DNA is unzipped and a complementary mRNA strand is transcribed. The mRNA moves to the ribosomes where translation occurs. Each codon is matched to a tRNA molecule with a complementary anticodon and carries a specific amino acid. The amino acids are joined together to form a polypeptide/protein.\nPart BI: Alleles are different versions of a gene. 'Multiple alleles' refers to three or more versions of a gene existing in a population.\nPart BII: The presence of e2 reduces the risk of AD. When it is present in the homozygous genotype or heterozygous with e3 there is a 40% reduction in risk of AD. The e2 allele appears to mask the effect of the e3 allele. When e2 is combined with e4 AD is 2.6 times more likely, suggesting that e2 cannot fully mask e4. If two e4 alleles are present the risk of AD is greatly increased and is 14.9 times more likely.\nPart C: Patients with untreated HSV infection have an increased risk of developing dementia each year compared to patients who are not infected or are treated. Both treated and untreated HSV infection groups show a sharp increase in the risk of dementia after 10 years, but the untreated HSV group increases to more than double the risk of the treated HSV group. The group that did not have HSV infection only has a very small increase in risk after 10 years.\nPart D: Infectious diseases are caused by pathogens that can be passed from one person to another. A pathogen is established as a cause of disease using Koch's postulates. The data provides evidence for an association between untreated viral (HSV) infection and the increased risk of development of dementia. Treating HSV patients with antiviral medication results in a much lower risk. This provides some evidence that the disease may be infectious. Non-infectious diseases do not spread from person to person. AD is the result of the build up of amyloid protein. The data about the APOE gene indicates that the presence of certain alleles, such as APOE-e4, result in a large increase in the risk of developing AD, providing evidence for an inherited genetic basis (non-infectious). From the information provided it is not possible to definitively classify AD as infectious or non-infectious as there appears to be evidence that the risk is influenced by both a viral pathogen and genes.",
     hasImage: false,
+    examImages: ["2019-q33a.jpg", "2019-q33.jpg"],
   },
 ];
 
@@ -491,6 +497,7 @@ const questions2023: Question[] = [
     markingCriteria: "Part A: 1 mark: Identifies sugar, phosphate and a base\nPart B: 2 marks: Completes the diagram with the correct mRNA sequence\n1 mark: Identifies uracil as a replacement for thymine for the mRNA sequence OR Completes the diagram with the complementary DNA sequence",
     sampleAnswer: "Part A: Sugar, phosphate and base (adenine, thymine, cytosine or guanine).\nPart B: mRNA strand: GUCA (G pairs with C, U pairs with A, C pairs with G, A pairs with T but in mRNA uracil replaces thymine).",
     hasImage: false,
+    examImages: ["2023-q21a.jpg"],
   },
   {
     id: "2023-q22",
@@ -506,6 +513,7 @@ const questions2023: Question[] = [
     markingCriteria: "Part A: 2 marks: Provides a clear description of how phagocytes help protect against pathogens\n1 mark: Provides some relevant information\nPart B: 4 marks: Demonstrates a thorough understanding of the immune response to the entry of a pathogen\n3 marks: Demonstrates a sound understanding of the immune response\n2 marks: Demonstrates some understanding of the immune response\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: They engulf or enclose a pathogen/antigen as it can identify non-self-substances. Once the pathogen is engulfed, the phagocyte breaks down the pathogen or antigen.\nPart B: Pathogens carry protein markers (antigens), so that when it enters a body, it is recognised as non-self. The immune response is then activated to destroy the pathogen. The antigen of the pathogen binds to the receptor of a B cell and activates it. This specific B cell replicates to form plasma cells. Plasma cells produce an antibody that is specific to the antigen.",
     hasImage: false,
+    examImages: ["2023-q22a.jpg"],
   },
 {
     id: "2023-q23", examPage: 20, examFile: "2023-hsc-biology", year: 2023, questionNumber: "23", section: "II", type: "short_answer", marks: 4,
@@ -533,6 +541,7 @@ const questions2023: Question[] = [
     markingCriteria: "Part A: 3 marks: Names a visual disorder; Relates problems with eye structure and function to the visual disorder\n2 marks: Names a visual disorder; Sketches in general terms the cause in relation to structure and/or function\n1 mark: Provides some relevant information\nPart B: 3 marks: Provides characteristics and features of a technology that is used to assist with the effects of a visual disorder\n2 marks: Outlines a technology that assists with a visual disorder\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: The lens of the eye refracts light from the environment on the retina. Cataracts are a visual disorder caused by the clouding of the lens which is normally clear. Clouding stops light passing through the lens leading to blurry vision.\nPart B: LASIK laser surgery is used to correct myopia, hyperopia and astigmatism caused by refraction errors from problems with the shape of the cornea. In LASIK surgery a thin flap is opened on the surface of the cornea, a laser then reshapes the cornea to provide the correct refraction and the flap is laid back into place.",
     hasImage: false,
+    examImages: ["2023-q24a.jpg"],
   },
   {
     id: "2023-q25",
@@ -571,6 +580,7 @@ const questions2023: Question[] = [
     markingCriteria: "Part A: 2 marks: Identifies the dependent variable AND a controlled variable\n1 mark: Identifies a controlled variable OR the dependent variable\nPart B: 3 marks: Justifies an appropriate conclusion for the investigation\n2 marks: Provides a relevant conclusion with limited justification\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: Dependent variable: the number of mosquitoes that land on the clothing. Controlled variable: size of container, number of mosquitoes in each container.\nPart B: Wearing clean clothing would reduce the transmission of malaria as mosquitoes land on clean clothing on average fewer times than on worn clothing. Infected mosquitoes landed on clothing three times as often as uninfected mosquitoes. Infected mosquitoes can only pass on infection if they land on a host and bite them.",
     hasImage: false,
+    examImages: ["2023-q26a.jpg"],
   },
 {
     id: "2023-q27", examPage: 28, examFile: "2023-hsc-biology", year: 2023, questionNumber: "27", section: "II", type: "extended_response", marks: 7,
@@ -594,6 +604,7 @@ const questions2023: Question[] = [
     markingCriteria: "Part A: 2 marks: Provides a feature that can be used to distinguish a bacterium from a virus\n1 mark: Provides some relevant information\nPart B: 2 marks: Sketches in general terms a method to distinguish between bacterial and viral pathogens\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: The size of a bacterium is 1-10µm, a virus is 0.05-0.1µm so a bacterium is much larger than a virus. Also: bacteria are prokaryotic cellular organisms; viruses are comprised of nucleic acids and a protein coat and are not cellular.\nPart B: The presence of a bacterial pathogen could be identified by using an agar culture. A viral pathogen cannot be cultured on agar. A bacterial pathogen can be observed using a high-powered light microscope, but a viral pathogen would not be observed as it is too small.",
     hasImage: false,
+    examImages: ["2023-q28a.jpg"],
   },
   {
     id: "2023-q29",
@@ -609,6 +620,7 @@ const questions2023: Question[] = [
     markingCriteria: "Part A: 2 marks: Sketches in general terms a physiological adaptation in endotherms\n1 mark: Provides some relevant information\nPart B: 4 marks: Explains TWO adaptations in plants that help maintain water balance\n3 marks: Relates ONE adaptation to water balance and identifies a second OR Outlines TWO adaptations\n2 marks: Relates ONE adaptation to water balance OR identifies adaptations\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: Endotherms can undergo vasoconstriction to decrease blood flow and volume. This reduces heat loss through the skin. Also: vasodilation expands blood vessels to increase blood flow to skin to promote cooling.\nPart B: 1. Sunken stomates: Stomata may be sunken in pits in the epidermis. Moist air is trapped over the top of the stomate. The saturated air reduces the evaporation rate. 2. Thick waxy cuticle: Makes the leaf watertight, acts as a barrier to evaporation and the shiny surface reflects heat lowering leaf temperature.",
     hasImage: false,
+    examImages: ["2023-q29a.jpg"],
   },
 {
     id: "2023-q30", examPage: 32, examFile: "2023-hsc-biology", year: 2023, questionNumber: "30", section: "II", type: "short_answer", marks: 5,
@@ -664,6 +676,7 @@ const questions2023: Question[] = [
     markingCriteria: "Part A: 1 mark: Identifies the type of mutation caused by bU\nPart B: 4 marks: Demonstrates comprehensive understanding of how the mutation could alter the DNA sequence and amino acid sequence; Relates how changed amino acids could change protein structure and function\n3 marks: Sound understanding of how mutation alters DNA/amino acid sequence; Relates to protein structure or function\n2 marks: Identifies a possible way the mutation could alter DNA or amino acid sequence\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: Point or substitution mutation.\nPart B: The mutated strand will contain guanine where thymine should be. If the new codon codes for a different amino acid, a different polypeptide chain will form, which could result in different folding and a non-functioning protein. If a stop codon is formed, the chain will be truncated. If the new codon codes for the same amino acid (due to degeneracy), there will be no change to the protein.",
     hasImage: true,
+    examImages: ["2023-q35a.jpg"],
     imageDescription: "Diagram showing DNA replication with bU incorporation",
   },
 ];
@@ -873,6 +886,7 @@ const questions2020: Question[] = [
     markingCriteria: "Part A: 1 mark: Identifies the correct mutation\nPart B: 2 marks: Outlines a type of mutation other than point mutation\n1 mark: Identifies another type of mutation",
     sampleAnswer: "Part A: Point mutation.\nPart B: Chromosomal mutations involve changes to the number of chromosomes in the genome.",
     hasImage: true,
+    examImages: ["2020-q23a.jpg"],
     imageDescription: "Two DNA sequences shown: original (T T A G C G T A A C G) and mutated (T T A G C G T T A C G) showing a single nucleotide substitution",
   },
   {
@@ -889,6 +903,7 @@ const questions2020: Question[] = [
     markingCriteria: "Part A: 2 marks: Completes appropriate graph of data\n1 mark: Provides some relevant information\nPart B: 2 marks: Uses a suitable line of best fit to show the year dialysis is likely to be required\n1 mark: Attempts to use the graph to show the year dialysis is likely to be required\nPart C: 3 marks: Describes a process occurring in dialysis AND relates how the identified process compensates for loss of a function of the kidneys\n2 marks: Outlines process(es) in dialysis AND relates a process to loss of a function of the kidneys\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: A correctly plotted graph with year on the x-axis (2011–2019) and GFR (mL min⁻¹) on the y-axis, with all data points accurately plotted.\nPart B: A line of best fit is drawn through the plotted data points and extended to where GFR = 15 mL min⁻¹. Based on the trend, dialysis would be required approximately in 2024–2025.\nPart C: Loss of kidney function may result in a failure to remove urea from blood. In dialysis, blood from the patient passes through selectively permeable dialysis tubing. Because the urea diffuses from the high concentrations in the blood to the low concentrations in the dialysate, the urea is removed from the blood.",
     hasImage: true,
+    examImages: ["2020-q24a.jpg"],
     imageDescription: "Blank grid with x-axis labelled Year (2010–2030) and y-axis labelled GFR (mL min⁻¹) for student to plot given data",
     graphConfig: {
       xAxis: { label: "Year", min: 2010, max: 2030, step: 2 },
@@ -912,6 +927,7 @@ const questions2020: Question[] = [
     markingCriteria: "Part A: 3 marks: Draws an appropriate conclusion from the data AND uses the data to provide justification for the validity of the conclusion\n2 marks: Draws a relevant conclusion AND uses the data to provide a reason for the conclusion\n1 mark: Provides some relevant information about the data\nPart B: 2 marks: Justifies a suitable improvement\n1 mark: Provides a suitable improvement\nPart C: 2 marks: Explains an advantage of external fertilisation\n1 mark: Provides a relevant advantage of external fertilisation",
     sampleAnswer: "Part A: Since there is little difference between the mean numbers of young/eggs produced in animals using the two modes of reproduction, and the variability of the data is large as shown by the standard deviations, the students could conclude that there is no difference between the number of young produced and the mode of fertilisation.\nPart B: The students have selected only a very few species for their study and either by chance or by specific selection of these species the number of eggs/young born are similar. A much larger number of species should be included if the current hypothesis is to be reinvestigated.\nPart C: Animals using external fertilisation will expend less energy on gestation, as this will occur outside the body.",
     hasImage: true,
+    examImages: ["2020-q25a.jpg"],
     imageDescription: "Table showing mode of fertilisation (internal/external), species names, average number of young/eggs per reproductive cycle, and mean ± SD for each group",
   },
   {
@@ -928,6 +944,7 @@ const questions2020: Question[] = [
     markingCriteria: "Part A: 2 marks: Uses the pedigree chart to explain that the yellow allele is recessive\n1 mark: Provides some relevant information\nPart B: 4 marks: Explains the possible outcomes of a cross between I and II AND relates differences in the outcomes of the cross to justify the type of inheritance AND communicates information succinctly using appropriate scientific terms and formats\n3 marks: Explains some outcomes of the cross between I and II including sex-linked inheritance AND communicates information logically using appropriate scientific terms and formats\n2 marks: Describes an outcome of the cross between I and II through either sex-linked inheritance OR Mendelian genetics\n1 mark: Provides any information relevant to the inheritance of colour in the fish",
     sampleAnswer: "Part A: The inheritance of yellow colour is recessive since both parents are orange but have yellow offspring. The yellow allele must be present in both parents but it is not expressed.\nPart B: If the inheritance is sex linked, then I and II would be XᴬY and XᵃXᵃ respectively. A cross between I and II would result in all male offspring being yellow and all female offspring being orange.\n\nIf the inheritance is not sex linked then II would have the genotype aa, whereas I would either have the genotype AA or Aa. If I was AA then all of the offspring would be orange. But if I was Aa, then 50% of the offspring would be yellow while the other 50% would be orange and the colours would be equally distributed between male and female offspring.\n\nTherefore, the absence of an orange male fish as a result of the cross between I and II would confirm that the inheritance of colour in the fish is sex linked.",
     hasImage: true,
+    examImages: ["2020-q26a.jpg"],
     imageDescription: "Pedigree chart for fish colour inheritance showing yellow and orange males and females; two specific individuals labelled I (yellow female) and II (orange male)",
   },
   {
@@ -944,6 +961,7 @@ const questions2020: Question[] = [
     markingCriteria: "Part A: 2 marks: Identifies TWO features that contribute to the validity of the study\n1 mark: Identifies ONE feature that contributes to the validity of this study\nPart B: 4 marks: Provides points for and/or against the hypothesis AND relates points made to the data\n3 marks: Provides a point for or against the hypothesis AND relates point to the data\n2 marks: Describes trends\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: Factors which contribute to the validity of the study could include: Age, Sex, Arsenic exposure, Large sample size, Socioeconomic status.\nPart B: Survival is highest in those exposed to less than 90 µg L⁻¹ arsenic in both males and females. This group serves as a control showing that most young people in the study survived over the 11-year period. The level of arsenic to which they were exposed is higher than recommended by WHO but survival was high nevertheless.\n\nIn both males and females, increasing doses of arsenic led to decreased survival, which suggests that arsenic is causing the decline in survival. The increasing response to increasing doses was best seen in the males. In females, all doses over 90 µg L⁻¹ led to a similar survival decrease which suggests there may be other factors that interact with the dose of arsenic to produce this result. Other factors could include nutritional state or genes.\n\nSurvival declined progressively over the 11 years, which supports the idea that as arsenic exposure increases over the years, survival declines. However, although the numbers in the study were large, survival only dropped by 0.1% or less.",
     hasImage: true,
+    examImages: ["2020-q27a.jpg"],
     imageDescription: "Two survival rate graphs (male and female) showing % survival over 11 years for three arsenic exposure categories: < 90, 90–223, and > 223 µg L⁻¹",
   },
   {
@@ -960,6 +978,7 @@ const questions2020: Question[] = [
     markingCriteria: "Part A: 3 marks: Explains the misunderstanding of meiosis shown in the model\n2 marks: Describes in general terms the misunderstanding shown in the model\n1 mark: Provides some relevant information\nPart B: 3 marks: Explains processes in meiosis that lead to genetic variation\n2 marks: Explains a process in meiosis that leads to genetic variation OR Identifies processes in meiosis that lead to genetic variation\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: The paired homologous chromosomes are incorrectly drawn. In a pair of chromosomes, one is paternal and the other is maternal. Prior to crossing over, each chromosome duplicates itself forming two chromatids and they should be identical, that is both chromatids should be either maternal or paternal and not different as shown in the model.\nPart B: In meiosis, homologous chromosomes are lined up in Metaphase I in random order and orientation (independently assorted). They separate in Meiosis I, resulting in different combinations of parental chromosomes in the gametes. Crossing over is the exchange of genetic material between the chromatids of homologous chromosomes during Meiosis I. This leads to a new combination of alleles on each chromatid.",
     hasImage: true,
+    examImages: ["2020-q28a.jpg"],
     imageDescription: "Diagram showing homologous chromosomes paired before crossing over, with chromatids incorrectly drawn as one maternal and one paternal",
   },
 {
@@ -994,6 +1013,7 @@ const questions2020: Question[] = [
     markingCriteria: "Part A: 6 marks: Explains all the graphs with respect to the negative feedback control of blood glucose in healthy humans AND makes clear references to features of the graphs AND shows detailed understanding of control of blood glucose\n5 marks: Explains the graphs with respect to the negative feedback control of blood glucose AND makes references to features of the graphs AND shows understanding of control of blood glucose\n4 marks: Describes the graphs AND links the graphs to features of the negative feedback control of blood glucose\n3 marks: Refers to feature(s) of the graphs AND links the feature(s) to the negative feedback control of blood glucose\n2 marks: Refers to features of the graphs OR refers to a feature of a graph AND provides a feature of negative feedback control of blood glucose\n1 mark: Provides some relevant information\nPart B: 3 marks: Outlines differences between control of blood glucose and body temperature\n2 marks: Outlines a difference between control of blood glucose and body temperature OR identifies two differences\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: The plasma levels measured in the first 60 minutes represent resting levels. After the meal, plasma glucose rises as a direct result of absorption of glucose from the gut into the bloodstream.\n\nRising blood glucose stimulates β cells in the pancreas to release the hormone insulin, which stimulates body cells to take up glucose to be used in their metabolism and the liver to take up glucose to be stored as glycogen. Therefore, the rise in insulin in Figure 2 is a direct result of the rise in plasma glucose. As the cells and liver take up glucose, they remove the glucose from the blood leading to the subsequent fall in plasma glucose levels. The falling glucose removes the stimulation of β cells and by this negative feedback mechanism, insulin levels also fall.\n\nGlucagon is a hormone that is an important part of the negative feedback loop that controls glucose levels in the blood. If plasma glucose falls to low levels, glucagon is released from alpha cells in the pancreas and causes glucose to be released into the blood from glycogen stores in the liver and muscles to restore normal glucose levels. In Figure 1, as glucose rises the alpha cells will produce less glucagon and falling glucagon levels can be seen in Figure 3. This will result in less glucose being released from the liver, reducing glucose levels.\nPart B: Temperature changes are detected by the hypothalamus in the brain but changes in glucose are detected by the pancreas. The response to changes in temperature is via the nervous system but glucose is regulated via hormones.",
     hasImage: true,
+    examImages: ["2020-q31a.jpg", "2020-q31.jpg"],
     imageDescription: "Three time-series graphs over 5 hours (with carbohydrate meal at t=1 hour): Figure 1 shows plasma glucose (mmol/L), Figure 2 shows insulin (pmol/L), Figure 3 shows glucagon (µg/mL)",
   },
   {
@@ -1010,6 +1030,7 @@ const questions2020: Question[] = [
     markingCriteria: "Part A: 2 marks: Identifies features that facilitate the transmission of rabies between hosts\n1 mark: Provides some relevant information\nPart BI: 3 marks: Explains a feature that distinguishes the rabies virus from cellular pathogens\n2 marks: Outlines feature(s) that distinguish between viral and cellular pathogens\n1 mark: Provides some relevant information\nPart BII: 5 marks: Explains the role of RNA polymerase in reproduction of the rabies virus, including reference to transcription, production of proteins and viral RNA replication AND relates newly produced proteins to RNA polymerase and viral RNA replication\n4 marks: Describes the role of RNA polymerase in reproduction including reference to transcription, production of proteins and viral RNA replication AND relates newly produced proteins to RNA polymerase\n3 marks: Outlines the role of RNA polymerase in reproduction including reference to the processes of transcription and RNA replication\n2 marks: Provides some features of the role of RNA polymerase\n1 mark: Provides some relevant information\nPart C: 8 marks: Accurately interprets and uses the relevant data and information to explain how PEP prevents rabies developing AND demonstrates an extensive knowledge of vaccination, passive and active immunity AND explains the role of antibodies AND communicates scientific information succinctly and logically using precise scientific terminology\n7 marks: Interprets and uses the data to explain how PEP prevents rabies AND demonstrates a thorough knowledge of vaccination, passive and active immunity AND describes the role of antibodies AND communicates scientific information logically using correct terminology\n5–6 marks: Interprets and uses data provided to explain how PEP prevents rabies AND demonstrates a sound knowledge of vaccination and immunity AND outlines the role of antibodies AND communicates using scientific terms AND makes reference to information provided\n3–4 marks: Provides some information about the role of antibodies and/or vaccines in preventing rabies\n1–2 marks: Provides relevant information about immunity and/or rabies",
     sampleAnswer: "Part A: The virus is able to travel via the nervous system to the salivary glands. This can result in direct contact transmission when the infected host bites another animal.\nPart BI: The rabies virus has a small genome composed of single-stranded RNA but the genome of cellular pathogens such as bacteria is much larger and is in the form of DNA which enables complex cellular processes without a host.\nPart BII: The viral RNA polymerase, which is made up of the L and P proteins, is responsible for the production of viral proteins and viral RNA, which are the components of new rabies viral particles.\n\nRNA polymerase is responsible for transcription of the viral RNA into complementary mRNA strands, which are then translated into rabies viral proteins (G, M, N, P and L) by host cell ribosomes.\n\nThe replication of rabies viral RNA is facilitated by the newly produced L and P proteins (RNA polymerase). In this process, a complementary strand of viral RNA is produced from the original viral RNA strand. This complementary strand is then used as a template for the RNA polymerase to catalyse the production of more viral RNA. The new strands produced are therefore the same as the original viral RNA.\n\nRNA polymerase is responsible for both the viral RNA and proteins needed in reproducing the virus.\nPart C: Once the rabies virus has entered the wound it will use the patient's cells to replicate and the viral concentration increases (as seen in the first five days). Without PEP the virus will continue to replicate, migrate to the CNS (by day 7), and eventually cause rabies and death.\n\nInitially the patient does not have memory cells for the virus and does not produce antibodies to it. The injection of HRIG provides the patient with human antibodies that are specific to the virus, providing passive immunity. The antibodies will combine with viral molecules and inactivate them and also facilitate their destruction by white cells such as phagocytes. The PEP graph shows these antibodies will only last for up to 21 days but have an important initial role in controlling viral numbers (the data shows a reduction in viral concentration by days 6–8). The antibodies help to prevent the virus progressing to the CNS.\n\nThe rabies vaccine contains an inactivated, harmless version of the rabies virus and will result in the development of acquired, active immunity. This occurs when macrophages present the viral antigen to specific helper T cells that have surface receptors complementary to it. These helper T cells then stimulate specific B cells that have also been exposed to the antigen to undergo mitosis and cell differentiation. The daughter cells will either be plasma cells that produce antibodies or will be kept as memory B cells in case of future infection.\n\nThe PEP graph shows that by day 7 the production of antibodies begins and increases sharply over the next few days. This coincides with the rapid decrease in viral concentration. By day 11 there are no viral particles left at the infection site and progression to the CNS and the disease has been avoided.",
     hasImage: true,
+    examImages: ["2020-q32a.jpg", "2020-q32.jpg"],
     imageDescription: "Numbered diagram showing 6-step pathway of rabies virus infection from bite site through muscle, peripheral nerves, spinal cord, brain, and into salivary glands",
   },
 ];
@@ -1485,6 +1506,7 @@ const questions2021: Question[] = [
     markingCriteria: "Part A: 2 marks: Correctly labels TWO features of the diagram\n1 mark: Correctly labels ONE feature on the diagram\nPart B: 2 marks: Completes TWO boxes in the flowchart correctly\n1 mark: Provides some relevant information\nPart C: 3 marks: Outlines a benefit and a limitation of the strategies\n2 marks: Outlines a benefit or limitation OR Identifies a benefit and a limitation OR Identifies benefits or limitations\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: Answers could include:\n• Plasma membrane\n• Absence of membrane bound organelles\n• DNA (nucleoid region)\n• Cell wall\n• Flagella\nPart B: The flowchart should show:\n• Pig 1 is suffering from diarrhoea\n• After feeding bacteria to Pig 2: Pig 2 develops diarrhoea\n• Bacteria isolated from Pig 2 are the same/identical to those from Pig 1, confirming Koch's postulates\nPart C: The use of antibiotics on Farm 1 eliminates the disease quickly but may induce resistance in the bacteria with longer term use so the strategy will become less effective.\n\nOn Farm 2, improved hygiene including removal of rats and mice is slow to eliminate the disease but provides a long-term solution that will prevent future outbreaks.",
     hasImage: true,
+    examImages: ["2021-q21a.jpg", "2021-q21.jpg"],
     imageDescription: "Diagram of a rod-shaped bacterium (approximately 1 μm scale bar) requiring students to label two features that classify it as a bacterium",
   },
 {
@@ -1534,6 +1556,7 @@ const questions2021: Question[] = [
     markingCriteria: "Part A: 3 marks: Identifies the type of mutation AND justifies the type of mutation with reference to the information provided\n2 marks: Identifies the type of mutation AND provides a reason for the type of mutation\n1 mark: Provides some relevant information\nPart B: 4 marks: Explains the effects of the mutations on the twins and their offspring\n3 marks: Explains some effects of the mutations on the twins and/or their offspring\n2 marks: Demonstrates some understanding of the effect(s) of the mutation(s)\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: It is a somatic mutation because it is a dominant trait but not present in the parents or the offspring of the affected male. If it were a germ-line mutation which occurs in the cells that form gametes, it is most likely it would be seen in the offspring.\nPart B: Mutation B occurred after twin formation, therefore affecting only Twin 1. Because it occurred prior to formation of the germ cells it will be evident in both the germ cells and the somatic cells of Twin 1 and through the germ cells may be passed to the offspring.\n\nBecause Mutation C occurs in the cells leading to somatic cells in Twin 2 only, it will be evident in the somatic cells of Twin 2 but not in the germline cells and can't be passed on to offspring.",
     hasImage: true,
+    examImages: ["2021-q24a.jpg"],
     imageDescription: "Pedigree chart showing an autosomal dominant trait. Generation I: unaffected female and male. Generation II: two unaffected females, one affected male, one unaffected male. Generation III: children of the affected male, all unaffected.",
   },
   {
@@ -1550,6 +1573,7 @@ const questions2021: Question[] = [
     markingCriteria: "Part A: 3 marks: Data for right and left ear plotted correctly AND appropriate key provided\n2 marks: All data plotted accurately OR Most data plotted correctly and includes an appropriate key\n1 mark: Plots some data\nPart B: 2 marks: Draws correct conclusions about the hearing level in both left and right ears\n1 mark: Provides some appropriate information about the hearing\nPart C: 3 marks: Justifies the use of a suitable technology to assist hearing\n2 marks: Outlines a relevant hearing technology\n1 mark: Provides relevant information on any hearing technology",
     sampleAnswer: "Part A: An audiogram with right ear plotted (typically with 'O' symbols) showing near-normal hearing (5–20 dB) across all frequencies, and left ear plotted (typically with 'X' symbols) showing significant hearing loss (55–100 dB) across all frequencies, with a key identifying right and left ear.\nPart B: Right ear has normal hearing.\nLeft ear has a deficit/cannot hear at a normal level.\nPart C: Bone conduction implants would be the most suitable technology for this patient. The blocked outer ear needs to be completely bypassed, and bone conduction works by detecting sound waves via a microphone, and relaying it to a sound processor that converts the waves into vibrations. These vibrations are transferred directly to the cochlea in order to hear the sound and so improve the patient's hearing.",
     hasImage: true,
+    examImages: ["2021-q25a.jpg"],
     imageDescription: "Audiogram grid with minimum detectable volume (dB) on Y-axis (-10 to 140 dB, inverted with normal hearing at top) and frequency (Hz) on X-axis (125–8000 Hz). Students plot data for both ears and include a key.",
     graphConfig: {
       xAxis: { label: "Frequency (Hz)", min: 250, max: 8000, step: 250, ticks: [250, 500, 1000, 2000, 4000, 8000] },
@@ -1608,6 +1632,7 @@ const questions2021: Question[] = [
     markingCriteria: "Part A: 3 marks: Demonstrates a thorough knowledge of the role of mRNA\n2 marks: Describes a feature of the role of mRNA OR Identifies features of the role of mRNA\n1 mark: Provides some relevant information\nPart B: 5 marks: Provides a comprehensive explanation of how the vaccine results in active immunity AND applies knowledge of mRNA and protein to the production of active immunity\n4 marks: Provides a sound explanation of how the vaccine results in active immunity AND links mRNA and protein to the production of active immunity\n3 marks: Demonstrates a sound knowledge of vaccination and the development of active immunity OR Links mRNA and protein to the production of active immunity\n2 marks: Outlines how a vaccine could provide immunity OR Demonstrates an understanding of active immunity\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: mRNA carries a complementary copy of a section of DNA that codes for a polypeptide to the ribosomes. At the ribosomes mRNA provides a template. Each codon (three nucleotides) on the mRNA results in the addition of a correct amino acid to form a polypeptide chain.\nPart B: The vaccine's mRNA enters cells and provides instructions for the production of the spike protein. The mRNA is translated at the ribosomes and the viral spike protein is produced and released into the body.\n\nThe protein will be an antigen in the body as it is foreign (not coded for by the human genome). This will trigger a specific response by B and T lymphocytes that match the antigen. Once the viral protein has been removed, memory B and T cells for the spike protein will remain, providing active immunity that allows for a rapid future response.\n\nIf the person is later exposed to the virus, the spike protein molecules on the virus's surface will trigger a rapid, large response by the memory cells.",
     hasImage: false,
+    examImages: ["2021-q28a.jpg"],
   },
 {
     id: "2021-q29", examPage: 26, examFile: "2021-hsc-biology",
@@ -1687,11 +1712,11 @@ const questions2021: Question[] = [
     module: "6",
     moduleContent: "Genetic Technologies",
     syllabusOutcomes: ["BIO12-5", "BIO12-13"],
-    questionText: "Question 33 (15 marks)\n\nGenetically engineered Atlantic salmon have been produced and approved for aquaculture in the US. These salmon have a transgene that includes a protein-coding sequence from a Chinook salmon's growth hormone gene and the promoter region of an Ocean Pout's antifreeze protein gene. The following diagram provides an overview of the production of the transgenic salmon.\n\nThe diagram shows numbered steps 1–7:\n- Steps 1–4 involve bacteria (gene cloning steps)\n- Steps 5–6 involve Ocean Pout fish and Chinook salmon (obtaining gene sequences)\n- Step 7 shows salmon eggs receiving the transgene to produce transgenic Atlantic salmon\n\n(a) Explain the processes shown in steps 1–4. (3 marks)",
+    questionText: "Question 33 (15 marks)\n\nGenetically engineered Atlantic salmon have been produced and approved for aquaculture in the US. These salmon have a transgene that includes a protein-coding sequence from a Chinook salmon's growth hormone gene and the promoter region of an Ocean Pout's antifreeze protein gene. The following diagram provides an overview of the production of the transgenic salmon.\n\nThe diagram shows numbered steps 1–7:\n- Steps 1–4 involve bacteria (gene cloning steps)\n- Steps 5–6 involve Ocean Pout fish and Chinook salmon (obtaining gene sequences)\n- Step 7 shows salmon eggs receiving the transgene to produce transgenic Atlantic salmon\n\n(a) Explain the processes shown in steps 1–4. (3 marks)\n\n(b) The graph below shows the growth (mass in kg) of transgenic Atlantic salmon compared to standard Atlantic salmon over time (months). The transgenic salmon grow faster, reaching approximately 4–5 kg (market size) at around 18–24 months, while the standard salmon take approximately 28–30 months to reach the same size.\n\nUsing the data in the graph, explain ONE benefit of the use of the transgenic salmon in aquaculture. (3 marks)\n\n(c) After the transgenic salmon reach market size they are grown in sea pens in the open ocean. The following diagram shows a flowchart of techniques used to prevent the transgene entering the wild-type gene pool.\n\nTechnique 1: Physical isolation of brood stock in freshwater tanks on land.\nTechnique 2: Brood stock treated with hormones so that genetically female fish develop as males and produce sperm containing only X chromosomes.\nTechnique 3: Eggs collected from wild-type female Atlantic salmon.\nTechnique 4: Eggs treated to prevent meiosis II, producing diploid eggs.\nTechnique 5: Triploid offspring grown to market size in physically isolated sea pens.\n\nWith reference to the techniques shown, analyse how reproduction technologies and physical isolation are used to protect biodiversity. (9 marks)",
     markingCriteria: "Part A: 3 marks: Explains the processes in the steps\n2 marks: Outlines the process of gene cloning\n1 mark: Provides relevant information\nPart B: 3 marks: Explains a benefit of the use of transgenic salmon in aquaculture AND links answer to data in the graph\n2 marks: Describes a benefit of the transgenic species OR Identifies a benefit of the transgenic salmon and links it to the data\n1 mark: Provides relevant information\nPart C: 9 marks: Demonstrates extensive knowledge and understanding of biotechnology, reproduction and biodiversity AND provides scientific analyses for the techniques used AND relates analyses to protecting and preserving biodiversity\n7–8 marks: Demonstrates thorough knowledge of biotechnology, reproduction and biodiversity AND provides scientific analyses for the main techniques used AND links techniques to maintaining biodiversity\n5–6 marks: Demonstrates sound knowledge of biotechnology and reproduction AND applies knowledge to explain technique(s) used AND links technique(s) to effect(s) on biodiversity\n3–4 marks: Demonstrates a sound knowledge of biotechnology/techniques and/or reproduction and/or biodiversity OR Demonstrates basic knowledge of biotechnology/techniques and makes a link to biodiversity\n1–2 marks: Provides relevant information",
     sampleAnswer: "Part A: The transgene is inserted into a plasmid by using enzymes. The plasmid is then placed into a bacterial host. As the host reproduces the plasmid is copied and so is the transgene (gene cloning). This is done in order to produce multiple copies of the gene.\nPart B: Transgenic salmon has a higher rate of growth in the first two years than standard salmon. Transgenic salmon reaches market size in the second year whereas the standard salmon takes five months longer. This saves money in producing the fish for market as there are lower feed and maintenance costs.\nPart C: Biodiversity is the variety in gene pools of species as well as the variety of species in ecosystems. Transgenic salmon carries the risk of reducing biodiversity and has the potential to do great harm.\n\nPhysical isolation techniques 1 and 5 prevent transgenic salmon from escaping into the environment. They may have a survival advantage, and pass the transgene onto offspring. This may reduce biodiversity as wild-type fish become less common and the gene pool is reduced. Transgenic salmon could outcompete other species, potentially reducing species biodiversity.\n\nReproductive techniques such as the hormone treatment in technique 2 allow sperm to be produced that only carries X chromosomes as the parents are genetically female. This sperm is used to fertilise eggs from wild-type salmon, and all offspring are female as none of the sperm have a Y chromosome. They will all have a copy of T from the sperm – only one T is needed as it is dominant. Technique 4 prevents meiosis II and results in diploid eggs being fertilised by haploid sperm. This produces infertile, triploid offspring that have three copies of each type of chromosome. These techniques prevent the transgene from being passed on.\n\nUsing eggs from wild-type salmon is crucial to preserving biodiversity as it prevents inbreeding of transgenic fish stock and ensures hybrid vigour in the offspring, preventing the accumulation of mutations.\n\nPhysical isolation, reproductive technologies and the introduction of hybrid vigour are crucial in protecting biodiversity in ecosystems as well as within the transgenic salmon population.",
-    hasImage: true,
-    imageDescription: "Diagram showing steps 1–7 of transgenic salmon production. Steps 1–4 show gene cloning in bacteria (extracting gene, inserting into plasmid, transforming bacteria, bacteria multiplying to clone gene). Steps 5–6 show gene sources from Ocean Pout (promoter) and Chinook salmon (growth hormone coding sequence). Step 7 shows injection of transgene into Atlantic salmon eggs to produce transgenic salmon.",
+    hasImage: false,
+    examImages: ["2021-q33a.jpg", "2021-q33.jpg"],
   },
 ];
 
@@ -2063,6 +2088,7 @@ const questions2022: Question[] = [
     markingCriteria: "Part A: 2 marks: Outlines ONE way that a pathogen can pass between hosts\n1 mark: Provides some relevant information\nPart B: 3 marks: Completes key with suitable pathogens\n2 marks: Completes some steps in the key correctly\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: Viral particles emitted by one person can be transferred directly through the air and inhaled by another person.\nPart B: Examples of named pathogens from the relevant group: Macroparasite (e.g. tapeworm/roundworm), Fungus/Protist (nucleus present), Bacterium (nucleus absent), Virus/Prion (no cells).",
     hasImage: false,
+    examImages: ["2022-q21a.jpg"],
   },
 {
     id: "2022-q22", examPage: 16, examFile: "2022-hsc-biology",
@@ -2094,6 +2120,7 @@ const questions2022: Question[] = [
     markingCriteria: "Part A: 2 marks: Outlines the process of artificial pollination\n1 mark: Provides some relevant information\nPart B: 2 marks: Explains an outcome of the use of artificial pollination\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: This process involves the transfer of pollen from the anther of one target plant to the stigma of another targeted plant.\nPart B: If the pollen from one plant is used to artificially pollinate a large number of plants, this will lead to a large number of offspring that are similar. Over time, if this is repeated in subsequent generations this will reduce the genetic diversity of the population.",
     hasImage: false,
+    examImages: ["2022-q23a.jpg"],
   },
   {
     id: "2022-q24",
@@ -2109,6 +2136,7 @@ const questions2022: Question[] = [
     markingCriteria: "Part A: 3 marks: Provides a graph that is correctly drawn including labels and scale for axes, points plotted correctly, appropriate line of best fit\n2 marks: Provides a graph that includes most aspects correctly\n1 mark: Provides suitable aspects of a graph\nPart B: 2 marks: Outlines the main features of the trend\n1 mark: Identifies a trend\nPart C: 3 marks: Identifies a type of chromosomal mutation AND explains the cause of the mutation\n2 marks: Outlines the cause of a chromosomal mutation\n1 mark: Provides some relevant information about a chromosomal mutation",
     sampleAnswer: "Part A: A scatter graph with maternal age on x-axis (20–45 years) and prevalence of chromosomal abnormalities per 1000 births on y-axis (0–40), with points plotted at (20,1.5), (30,3), (35,8), (40,22), (45,38), and a curved (exponential) line of best fit.\nPart B: As maternal age increases, the prevalence of chromosomal abnormalities increases. After the age of 30, there is a rapid increase in prevalence – it is increasing at an increasing rate.\nPart C: One type of chromosomal mutation is a numerical abnormality. This is where there are more or fewer chromosomes than the normal diploid cell. These abnormalities can be caused during meiosis due to non-disjunction. Non-disjunction means that a pair of homologous chromosomes fails to separate/segregate during meiosis so that some of the gametes have one chromosome too many and some of the gametes have one chromosome too few.",
     hasImage: false,
+    examImages: ["2022-q24a.jpg"],
     graphConfig: {
       xAxis: { label: "Maternal age (years)", min: 20, max: 50, step: 5 },
       yAxis: { label: "Prevalence (per 1000 births)", min: 0, max: 40, step: 5 },
@@ -2180,6 +2208,7 @@ const questions2022: Question[] = [
     markingCriteria: "Part A: 1 mark: Identifies the correct model\nPart B: 3 marks: Provides a description of DNA replication\n2 marks: Outlines some steps in DNA replication\n1 mark: Provides some relevant information\nPart C: 3 marks: Outlines differences in DNA in prokaryotic and eukaryotic cells\n2 marks: Outlines a difference in DNA in prokaryotic and eukaryotic cells OR identifies differences in DNA in prokaryotic and eukaryotic cells\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: Model 2\nPart B: An enzyme unzips the DNA, creating a replication fork. On each strand, an enzyme attaches to the original DNA nucleotides and uses them as a template. It 'reads' the bases, and adds complementary nucleotides. Another enzyme 'glues' the nucleotides together, forming a new, double stranded section of DNA.\nPart C: There are many differences such as prokaryotic DNA is a circular molecule found in the cytoplasm, carrying a small number of genes and not tightly coiled around histone proteins. In contrast, eukaryotic DNA is a linear molecule found in the nucleus carrying a large number of genes and tightly coiled around histone and other proteins.",
     hasImage: true,
+    examImages: ["2022-q28a.jpg"],
     imageDescription: "Diagram showing three proposed models of DNA replication: Model 1 (conservative), Model 2 (semi-conservative), and Model 3 (dispersive), with original strands shown in one colour and new strands in another.",
   },
   {
@@ -2196,6 +2225,7 @@ const questions2022: Question[] = [
     markingCriteria: "Part A: 2 marks: Provides cause and effect for the increase in cotton yield\n1 mark: Provides some relevant information\nPart B: 5 marks: Demonstrates a thorough understanding of the links between the use of Bt cotton, insecticides, disease control and natural selection; provides a comprehensive analysis of the data; interprets inter-relationships between use of genetically engineered crops and insecticides; makes an informed judgement\n4 marks: Demonstrates a sound understanding; provides an analysis of the data; provides a suitable judgement\n3 marks: Demonstrates an understanding of the use of Bt cotton and disease control; outlines benefit(s) and limitation(s); supports answer with reference to data\n2 marks: Outlines a benefit or limitation of using Bt cotton AND provides link(s) to the data\n1 mark: Provides some relevant information",
     sampleAnswer: "Part A: As the percentage of Bt cotton grown increased, so did the cotton yield. Bt cotton reduces insect attack, increasing yield.\nPart B: The introduction of Bt cotton initially resulted in less insect damage and disease and a saving in application of insecticides.\n\nAs Bt cotton was introduced, the amount of insecticides applied to kill bollworm decreased, eventually to zero, suggesting that Bt cotton was effectively controlling disease due to bollworm. However, the data show that once most of the cotton crops grown were Bt cotton, insecticide use to kill hemiptera increased markedly to a higher level than before Bt cotton was introduced.\n\nA conclusion that can be drawn is that Bt toxin killed bollworms but did not kill hemiptera. Removal of bollworms provided a survival advantage for hemiptera which became the dominant pest. Therefore, a new cause of disease in cotton was dominant and the benefit of Bt cotton for disease control was temporary.\n\nThe data show that use of Bt cotton can control disease due to one pest, but removal of that pest opens the way for other pests to survive and reproduce so that disease in the crop persists. It can be concluded that Bt cotton only has short-term benefits and needs to be complemented by use of pesticides.",
     hasImage: true,
+    examImages: ["2022-q29a.jpg"],
     imageDescription: "Three graphs showing: (1) cotton yield (kg/ha) from 2002–2013 showing an increase; (2) percentage of Bt cotton grown from 2002–2013 showing an increase to nearly 100%; (3) tonnes of insecticide use from 2002–2013 showing total insecticide, bollworm insecticide, and hemipteran insecticide.",
   },
 {
@@ -2229,6 +2259,7 @@ const questions2022: Question[] = [
     markingCriteria: "Part AI: 4 marks: Demonstrates a thorough understanding of the features of the methodology used; provides a suitable judgement\n3 marks: Demonstrates a sound understanding of the features of the methodology used; provides a suitable judgement\n2 marks: Demonstrates an understanding of the methodology used\n1 mark: Provides some relevant information\nPart AII: 3 marks: Justifies suitable conclusions from the data\n2 marks: Justifies a suitable conclusion from the data OR provides conclusions from the data\n1 mark: Provides some relevant information\nPart BI: 4 marks: Provides a suitable flow chart of EGFR synthesis that includes: gene transcription (use of DNA and mRNA), translation (use of mRNA, ribosomes and tRNA), and the production of the protein\n3 marks: Provides a flow chart that includes most features of gene transcription, translation and protein production OR all features of protein synthesis\n2 marks: Provides some features of polypeptide synthesis\n1 mark: Provides some relevant information\nPart BII: 4 marks: Explains a link between mutation, EGFR protein structure and the regulation of cell division; links cancer to uncontrolled cell division\n3 marks: Describes a link between EGFR mutation and protein structure; links cancer to uncontrolled cell division OR describes a link between DNA, mutation and EGFR protein structure and function\n2 marks: Outlines an effect of mutation on the EGFR protein OR identifies an effect of mutation on EGFR and links it to uncontrolled cell division\n1 mark: Provides relevant information",
     sampleAnswer: "Part AI: The study used large numbers of women matched for exposure to cigarette smoke in three categories and followed these women for 14 years. The numbers of women and the time period are adequate for a valid study. However, follow up over subsequent years would allow for data that are even more definitive.\n\nThe categories of women assume that they spend similar periods of time with a smoker, and that each smoker smokes a similar amount. However, in reality, the time exposure and the volume of smoke they are exposed to may vary greatly. This may compromise the data but the large cohort of women should average out this effect, so overall the method appears valid.\nPart AII: Exposure to smoke either passively or actively increases the risk of dying from lung cancer, as seen by nearly double the number of deaths between non-smoker women with non-smoker husbands (8.7/100,000) compared to women with smoker husbands (15.5/100,000) or smoking women (32.8/100,000). Lung cancer can be caused by factors other than exposure to cigarette smoke as shown by the mortality rate of women who have not been exposed being 8.7/100,000.\nPart BI: EGFR gene (DNA in nucleus) → Transcription (RNA polymerase reads DNA template strand) → pre-mRNA → RNA processing (introns removed) → mature mRNA → Translation (ribosome reads mRNA codons, tRNA brings amino acids) → Polypeptide chain → Folding/post-translational modification → EGFR protein\nPart BII: A mutation of the EGFR gene is a change in its DNA base sequence/codons. If this change is in a coding region of the gene it can result in a change to the amino acid sequence of the polypeptide. This may alter the folding and properties of the protein and may affect its function. For example if there is a change in the enzyme region of the protein this may alter the active site and therefore enzyme activity leading to changes that could alter the rate of DNA replication and cell division.\n\nLung cancer is the result of uncontrolled cell division. Since the EGFR protein is associated with controlling cell division, mutations in the EGFR gene may lead to uncontrolled cell division and therefore cancer.",
     hasImage: false,
+    examImages: ["2022-q31ai.jpg", "2022-q31.jpg"],
   },
 {
     id: "2022-q32", examPage: 34, examFile: "2022-hsc-biology",
@@ -2619,6 +2650,7 @@ const questions2024: Question[] = [
     markingCriteria: "Part A: 2 marks: Identifies BOTH structures correctly.\n1 mark: Provides some relevant information.\nPart B: 3 marks: Correctly compares all features of sexual and asexual reproduction.\n2 marks: Compares most features of sexual and asexual reproduction correctly.\n1 mark: Provides some relevant information.",
     sampleAnswer: "Part A: Pollen – anther\nOvule – ovary\nPart B: Feature / Sexual / Asexual\nGenetic variability (yes/no) / Yes / No\nNumber of parents required / 2 / 1\nExample of an organism / Humans / Bacteria",
     hasImage: true,
+    examImages: ["2024-q21a.jpg"],
     imageDescription: "Diagram of a flower showing labelled parts: Stigma, Anther, Filament, Ovary",
     tableConfig: {
       columns: ["Feature", "Sexual", "Asexual"],
@@ -2641,6 +2673,7 @@ const questions2024: Question[] = [
     markingCriteria: "Part A: 2 marks: Justifies a safety precaution used to prevent infection.\n1 mark: Provides some relevant information.\nPart B: 2 marks: Explains how to ensure the investigation is reliable.\n1 mark: Provides some relevant information.",
     sampleAnswer: "Part A: The wearing of gloves to prevent contact with skin and the subsequent entry of pathogens into skin/mouth. Keeping the petri dish closed and wiping down the benchtop with an antiseptic after viewing the microbes – this will kill any pathogens that may have escaped the petri dish and could be transferred to the student.\nPart B: The student could repeat the experiment by using five plates to culture the same sample of food or water. This would mean the student could check that the results are similar in each test.",
     hasImage: false,
+    examImages: ["2024-q22a.jpg"],
   },
 {
     id: "2024-q23", examPage: 20, examFile: "2024-hsc-biology-cc",
@@ -2672,6 +2705,7 @@ const questions2024: Question[] = [
     markingCriteria: "Part A: 2 marks: Outlines a cause of a disease relating to environmental exposure.\n1 mark: Provides some relevant information.\nPart B: 3 marks: Explains how a program/campaign will help to decrease the incidence of the disease.\n2 marks: Outlines features of a relevant program/campaign.\n1 mark: Provides some relevant information.",
     sampleAnswer: "Part A: Lung cancer can be caused by exposure to inhalation of smoke from cigarettes.\nPart B: An educational program in schools could teach students that UV exposure causes skin cancer, and that to protect from this, they should wear hats and sunscreen when outside. This will help to increase student's understanding of the risk and therefore increase compliance, and help to prevent the cause of skin cancer (UV rays damaging DNA in cells).",
     hasImage: false,
+    examImages: ["2024-q24a.jpg"],
   },
   {
     id: "2024-q25",
@@ -2687,6 +2721,7 @@ const questions2024: Question[] = [
     markingCriteria: "Part A: 2 marks: Explains the relationship between the cloning of the dog and being born with both eyes.\n1 mark: Provides some relevant information.\nPart B: 4 marks: Describes how animals can be cloned.\n3 marks: Outlines how animals can be cloned.\n2 marks: Demonstrates some understanding of the cloning of animals.\n1 mark: Provides some relevant information.",
     sampleAnswer: "Part A: The rescue dog had been injured and lost an eye but it still had the genetic code for two eyes which the clone inherited.\nPart B: The egg of a host animal is enucleated (nucleus removed). The nucleus of a body cell of the animal to be cloned is removed. The nucleus of the animal to be cloned is inserted into the enucleated host animal's egg to produce a zygote. The zygote is stimulated to divide via electric charge. The zygote is then transplanted into the surrogate mother's uterus. After a period of time, a cloned animal is born.",
     hasImage: false,
+    examImages: ["2024-q25a.jpg"],
   },
 {
     id: "2024-q26", examPage: 23, examFile: "2024-hsc-biology-cc",
@@ -2735,6 +2770,7 @@ const questions2024: Question[] = [
     markingCriteria: "Part A: 3 marks: Provides the correct parental genotypes and suitable working with a Punnett square AND provides the correct probability of the second child having cystic fibrosis.\n2 marks: Provides the correct probability with some correct working OR provides the correct parental genotypes with suitable working.\n1 mark: Provides some relevant information.\nPart B: 4 marks: Provides a thorough explanation of how the deletion removes only one amino acid, refers to isoleucine, phenylalanine and the final amino acid sequence.\n3 marks: Provides a sound explanation of the deletion of one amino acid, refers to appropriate amino acids or the effects of deletions.\n2 marks: Demonstrates some understanding of how mRNA codes for amino acids or of the effects of deletions.\n1 mark: Provides some relevant information.",
     sampleAnswer: "Part A: R  r\nR  RR  Rr\nr  Rr  rr\nThere is a 25% chance of the second child having cystic fibrosis.\nPart B: A triplet of mRNA nucleotides codes for one amino acid, however, the three nucleotides that are removed span across two triplet codons – the codon for isoleucine and the codon for phenylalanine. Therefore, it would be expected that both amino acids are affected. However, isoleucine can be coded for by a number of different triplet nucleotide combinations. The correct coding is AUC, but after the deletion of the three nucleotides, the code left is AUU, which also codes for isoleucine. Thus, only the phenylalanine amino acid is removed.",
     hasImage: false,
+    examImages: ["2024-q28a.jpg", "2024-q28.jpg"],
   },
   {
     id: "2024-q29",
@@ -2750,6 +2786,7 @@ const questions2024: Question[] = [
     markingCriteria: "Part A: 2 marks: All points plotted correctly AND appropriate line of best fit drawn.\n1 mark: Some points plotted correctly OR line of best fit attempted.\nPart B: 3 marks: Extrapolates the line of best fit, states the percentage value from y-axis, and calculates the number of people with type 2 diabetes in 2040 based on 9 billion people.\n2 marks: Demonstrates some understanding of how to determine the number of people with type 2 diabetes in 2040.\n1 mark: Provides some relevant detail.",
     sampleAnswer: "Part A: Plot points at 1990=3.1%, 2000=3.7%, 2010=4.3%, 2020=5.6% and draw line of best fit.\nPart B: Extend line of best fit to 2040 ≈ 7.7%. Number of people = 7.7/100 × 9,000,000,000 ≈ 693,000,000 people.",
     hasImage: true,
+    examImages: ["2024-q29a.jpg"],
     imageDescription: "Grid with x-axis from 1990 to 2040 (Year) and y-axis from 0-10 (Percentage of population affected by Type 2 diabetes %)",
     graphConfig: {
       xAxis: { label: "Year", min: 1990, max: 2040, step: 10 },
@@ -2773,6 +2810,7 @@ const questions2024: Question[] = [
     markingCriteria: "Part A: 3 marks: Provides a sound comparison of the processes of transcription and DNA replication.\n2 marks: Demonstrates some understanding of the process of transcription and DNA replication.\n1 mark: Provides some relevant information.\nPart B: 5 marks: Provides a thorough explanation of the importance of mRNA and tRNA in polypeptide synthesis.\n4 marks: Provides a sound explanation of the importance of mRNA and tRNA in polypeptide synthesis.\n3 marks: Demonstrates some understanding of the importance of mRNA and tRNA in polypeptide synthesis.\n2 marks: Demonstrates an understanding of mRNA or tRNA.\n1 mark: Provides some relevant information.",
     sampleAnswer: "Part A: Both process A (transcription) and DNA replication involve unwinding of DNA double strand to produce complementary strand. In replication, DNA is copied to produce two identical strands of DNA whereas in transcription, DNA is copied to produce single strand mRNA.\nPart B: mRNA is synthesised from the DNA template in the nucleus during transcription. This mRNA carries the genetic instructions (codon) from the DNA in the nucleus to the ribosomes in the cytoplasm. Once the mRNA reaches the ribosome, the process of translation begins. Each tRNA molecule has an anticodon that pairs with a complementary codon on the mRNA strand. The mRNA codons are read in sequence, and as each tRNA brings its specific amino acid to the ribosome, the polypeptide is assembled.",
     hasImage: true,
+    examImages: ["2024-q30a.jpg"],
     imageDescription: "Diagram showing polypeptide synthesis: DNA, Process A (transcription in nucleus), mRNA, Process B (translation at ribosomes), tRNA bringing amino acids",
   },
   {
@@ -2789,6 +2827,7 @@ const questions2024: Question[] = [
     markingCriteria: "Part A: 1 mark: Identifies the correct time.\nPart B: 3 marks: Provides a sound explanation of whether torpor is present in the human and kookaburra with reference to the graph.\n2 marks: Provides a sound explanation of whether torpor is present in the kookaburra with reference to the graph.\n1 mark: Provides some relevant information.\nPart C: 2 marks: Outlines an adaptation leading to heat generation or retention.\n1 mark: Provides some relevant information.",
     sampleAnswer: "Part A: 4 am\nPart B: The human did not display torpor, since their body temperature remained fairly constant throughout the time period. This did not indicate a decrease in physiological functioning. The kookaburra did display torpor, since they had a decrease in body temperature between 5 pm and 4 am, which indicates a decrease in physiological functioning.\nPart C: The kookaburra can raise its temperature by fluffing up feathers which traps a layer of warm air between the feathers and the body. This retains heat.",
     hasImage: true,
+    examImages: ["2024-q31a.jpg"],
     imageDescription: "Line graph showing body temperature (°C) of a kookaburra and a human over 24 hours from 12pm to 12pm, with kookaburra temperature dropping significantly during inactive period",
   },
 {
@@ -2822,6 +2861,7 @@ const questions2024: Question[] = [
     markingCriteria: "Part A: 2 marks: Outlines clearly the significance of crossing over in meiosis.\n1 mark: Provides some relevant information.\nPart B: 2 marks: Draws all four possible chromosomes correctly for the gametes.\n1 mark: Provides some relevant information.",
     sampleAnswer: "Part A: Increasing genetic variation, which gives the Jack Jumper ant a better chance to survive environmental change.\nPart B: Four gametes: D E H, d e h (parental types), D E h, d e H (recombinant types)",
     hasImage: true,
+    examImages: ["2024-q33a.jpg"],
     imageDescription: "Diagram showing homologous chromosomes and chromatids with crossing over, showing three gene loci D/d, E/e, H/h",
   },
 {
@@ -2841,7 +2881,7 @@ const questions2024: Question[] = [
     hasImage: false,
   },
   {
-    id: "2024-q35", examPage: 37, examFile: "2024-hsc-biology-cc",
+    id: "2024-q35",
     year: 2024,
     questionNumber: "35",
     section: "II",
@@ -2850,11 +2890,10 @@ const questions2024: Question[] = [
     module: "8",
     moduleContent: "Technologies and Disorders",
     syllabusOutcomes: ["BIO12-5", "BIO12-6", "BIO12-15"],
-    questionText: "The graph shows the results of a survey conducted to determine if children changed their method of communication after cochlear implantation. (Graph shows use of sign language before and after implantation for different age groups.)\nWith reference to the data, describe how cochlear implants work, and how they affect communication in children.",
+    questionText: "Question 35 (5 marks)\n\nA survey was conducted to determine if children changed their method of communication after cochlear implantation. The results showed the percentage of children using sign language before and after implantation, grouped by age at implantation:\n\n- Children implanted at age 0–2 years: ~80% used sign language before implantation; this dropped to ~10% five years after implantation.\n- Children implanted at age 3–5 years: ~80% used sign language before implantation; this dropped to ~40% five years after implantation.\n- Children implanted at age >5 years: ~80% used sign language before implantation; this remained at ~75% five years after implantation.\n\nWith reference to the data, describe how cochlear implants work, and how they affect communication in children.",
     correctAnswer: "Cochlear implants are electronic devices surgically inserted into the cochlea to improve hearing when the cochlea is damaged. They directly stimulate the auditory nerve and help carry sound signals directly to the brain. Children implanted at a young age reduce their use of sign language over the following five years so that approximately 10% are using sign language five years after implantation. Children implanted when older (>5 years old) continue to use sign language and don't change their mode of communication. Children implanted between three and five years decrease use of sign language but not as much as when implanted younger. The data suggest cochlear implants change communication when implanted at a younger age.",
     markingCriteria: "5 marks: Demonstrates an extensive understanding of how cochlear implants work and how they affect communication in children with reference to the data.\n4 marks: Demonstrates a thorough understanding of how cochlear implants work and how they affect communication in children with reference to the data.\n3 marks: Demonstrates a sound understanding of how cochlear implants work and how they affect communications in children with some reference to the data OR demonstrates a thorough understanding of how cochlear implants affect communication in children with reference to the data.\n2 marks: Demonstrates some understanding of how cochlear implants work or how they affect communication in children.\n1 mark: Provides some relevant information.",
     sampleAnswer: "Cochlear implants are electronic devices that are surgically inserted into the cochlear to improve hearing when the cochlear is damaged. They directly stimulate the auditory nerve and help carry the sound signals directly to the brain. If a child is implanted at a young age they reduce their use of sign language as a mode of communication over the following five years so that approximately 10% of children are using sign language five years after implantation. If children are implanted when they are older (> 5 years old) they continue to use sign language and don't change their mode of communication. If children are implanted when they are between three and five years of age they decrease their use of sign language, but not as much as when they are implanted younger. The data suggest that cochlear implants change communication when implanted at a younger age.",
-    hasImage: true,
-    imageDescription: "Graph showing results of survey on children's method of communication (sign language use) before and after cochlear implantation, by age at implantation",
+    hasImage: false,
   },
 ];
